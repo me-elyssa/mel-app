@@ -52,6 +52,7 @@ export default function DocumentoForm({ documento, onSalvar, onFechar }: Documen
   );
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [erroUpload, setErroUpload] = useState("");
 
   const set = <K extends keyof CreateDocumentoInput>(k: K, v: CreateDocumentoInput[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -60,9 +61,12 @@ export default function DocumentoForm({ documento, onSalvar, onFechar }: Documen
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setErroUpload("");
     try {
       const url = await uploadFile(file, "documentos", "uploads");
       set("file_url", url);
+    } catch (err) {
+      setErroUpload(err instanceof Error ? err.message : "Erro ao enviar arquivo.");
     } finally {
       setUploading(false);
     }
@@ -178,6 +182,7 @@ export default function DocumentoForm({ documento, onSalvar, onFechar }: Documen
                 <input type="file" className="hidden" onChange={handleFileChange} />
               </label>
             </div>
+            {erroUpload && <p className="mt-1 text-xs text-red-500">{erroUpload}</p>}
             {form.file_url && isGoogleDriveUrl(form.file_url) && (
               <div className="mt-2">
                 <DriveFileCard url={form.file_url} onClick={(e) => e.preventDefault()} />
