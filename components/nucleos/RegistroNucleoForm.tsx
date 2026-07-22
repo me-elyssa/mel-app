@@ -30,15 +30,19 @@ export default function RegistroNucleoForm({ nucleoId, onCriar }: RegistroNucleo
   const [uploading, setUploading] = useState(false);
   const [fileUrl, setFileUrl] = useState("");
   const [fileName, setFileName] = useState("");
+  const [erroUpload, setErroUpload] = useState("");
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setErroUpload("");
     try {
       const url = await uploadFile(file, "notas", "uploads");
       setFileUrl(url);
       setFileName(file.name);
+    } catch (err) {
+      setErroUpload(err instanceof Error ? err.message : "Erro ao enviar arquivo.");
     } finally {
       setUploading(false);
     }
@@ -112,10 +116,13 @@ export default function RegistroNucleoForm({ nucleoId, onCriar }: RegistroNucleo
       </div>
 
       {modoArquivo ? (
-        <label className="flex items-center justify-center h-[40px] rounded-[10px] border border-dashed border-[#C7CDD6] bg-white cursor-pointer text-xs text-[#545F6C] hover:bg-[#F3F5F9]">
-          {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : fileName || "Escolher arquivo"}
-          <input type="file" className="hidden" onChange={handleFileChange} />
-        </label>
+        <div className="space-y-1">
+          <label className="flex items-center justify-center h-[40px] rounded-[10px] border border-dashed border-[#C7CDD6] bg-white cursor-pointer text-xs text-[#545F6C] hover:bg-[#F3F5F9]">
+            {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : fileName || "Escolher arquivo"}
+            <input type="file" className="hidden" onChange={handleFileChange} />
+          </label>
+          {erroUpload && <p className="text-xs text-red-500">{erroUpload}</p>}
+        </div>
       ) : (
         <textarea
           value={conteudo}
