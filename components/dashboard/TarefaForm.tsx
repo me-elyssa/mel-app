@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { formInicial, mensagemErro, normalizarPayload } from "@/lib/formPayload";
 import type { CreateTarefaInput, Tarefa } from "@/types/entities";
 
 const STATUS_OPTS = [
@@ -50,10 +51,9 @@ interface TarefaFormProps {
 }
 
 export default function TarefaForm({ tarefa, onSalvar, onFechar }: TarefaFormProps) {
-  const [form, setForm] = useState<CreateTarefaInput>(
-    tarefa ? { ...defaultForm, ...tarefa } : defaultForm
-  );
+  const [form, setForm] = useState<CreateTarefaInput>(formInicial(defaultForm, tarefa));
   const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState("");
 
   const set = <K extends keyof CreateTarefaInput>(k: K, v: CreateTarefaInput[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -62,8 +62,14 @@ export default function TarefaForm({ tarefa, onSalvar, onFechar }: TarefaFormPro
     e.preventDefault();
     if (!form.titulo.trim()) return;
     setLoading(true);
-    await onSalvar(form);
-    setLoading(false);
+    setErro("");
+    try {
+      await onSalvar(normalizarPayload(form));
+    } catch (err) {
+      setErro(mensagemErro(err, "Não foi possível salvar a tarefa."));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -198,6 +204,8 @@ export default function TarefaForm({ tarefa, onSalvar, onFechar }: TarefaFormPro
               className="w-full rounded-[12px] border border-[#EAECEF] px-3 py-2 text-sm text-[#0B0F15] bg-white resize-none focus:outline-none focus:ring-2 focus:ring-[#1E63FF]"
             />
           </div>
+
+          {erro && <p className="text-sm text-red-500">{erro}</p>}
 
           {/* Ações */}
           <div className="flex justify-end gap-3 pt-2">

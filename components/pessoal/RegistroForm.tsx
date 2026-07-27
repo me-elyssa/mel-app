@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { uploadFile } from "@/lib/storage";
 import { CATEGORIA_LABEL } from "./categoria-colors";
+import { formInicial, mensagemErro, normalizarPayload } from "@/lib/formPayload";
 import type { CreateRegistroPessoalInput, RegistroCategoria, RegistroPessoal } from "@/types/entities";
 
 const CATEGORIA_OPTS: { value: RegistroCategoria; label: string }[] = (
@@ -33,12 +34,11 @@ interface RegistroFormProps {
 }
 
 export default function RegistroForm({ registro, onSalvar, onFechar }: RegistroFormProps) {
-  const [form, setForm] = useState<CreateRegistroPessoalInput>(
-    registro ? { ...defaultForm, ...registro } : defaultForm
-  );
+  const [form, setForm] = useState<CreateRegistroPessoalInput>(formInicial(defaultForm, registro));
   const [modoArquivo, setModoArquivo] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [erro, setErro] = useState("");
 
   const set = <K extends keyof CreateRegistroPessoalInput>(k: K, v: CreateRegistroPessoalInput[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -47,10 +47,13 @@ export default function RegistroForm({ registro, onSalvar, onFechar }: RegistroF
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setErro("");
     try {
       const url = await uploadFile(file, "registros", "uploads");
       set("file_url", url);
       set("file_name", file.name);
+    } catch (err) {
+      setErro(mensagemErro(err, "Erro ao enviar arquivo."));
     } finally {
       setUploading(false);
     }
@@ -60,8 +63,14 @@ export default function RegistroForm({ registro, onSalvar, onFechar }: RegistroF
     e.preventDefault();
     if (!form.titulo.trim()) return;
     setLoading(true);
-    await onSalvar(form);
-    setLoading(false);
+    setErro("");
+    try {
+      await onSalvar(normalizarPayload(form));
+    } catch (err) {
+      setErro(mensagemErro(err, "Não foi possível salvar o registro."));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -160,6 +169,8 @@ export default function RegistroForm({ registro, onSalvar, onFechar }: RegistroF
               className="w-full rounded-[12px] border border-[#EAECEF] px-3 py-2 text-sm text-[#0B0F15] bg-white resize-none focus:outline-none focus:ring-2 focus:ring-[#1E63FF]"
             />
           )}
+
+          {erro && <p className="text-sm text-red-500">{erro}</p>}
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="ghost" onClick={onFechar} className="text-[#6A7686]">

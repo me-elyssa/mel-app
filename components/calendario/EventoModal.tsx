@@ -6,6 +6,7 @@ import { X, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TIPO_LABEL } from "./evento-colors";
+import { formInicial, mensagemErro, normalizarPayload } from "@/lib/formPayload";
 import type { CreateEventoInput, Evento, EventoTipo } from "@/types/entities";
 
 const TIPO_OPTS: { value: EventoTipo; label: string }[] = (
@@ -32,9 +33,10 @@ export default function EventoModal({ evento, dataInicial, onSalvar, onExcluir, 
     tarefa_id: null,
   };
 
-  const [form, setForm] = useState<CreateEventoInput>(evento ? { ...defaultForm, ...evento } : defaultForm);
+  const [form, setForm] = useState<CreateEventoInput>(formInicial(defaultForm, evento));
   const [loading, setLoading] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
+  const [erro, setErro] = useState("");
 
   const set = <K extends keyof CreateEventoInput>(k: K, v: CreateEventoInput[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -43,15 +45,27 @@ export default function EventoModal({ evento, dataInicial, onSalvar, onExcluir, 
     e.preventDefault();
     if (!form.titulo.trim() || !form.data) return;
     setLoading(true);
-    await onSalvar(form);
-    setLoading(false);
+    setErro("");
+    try {
+      await onSalvar(normalizarPayload(form));
+    } catch (err) {
+      setErro(mensagemErro(err, "Não foi possível salvar o evento."));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleExcluir = async () => {
     if (!onExcluir) return;
     setExcluindo(true);
-    await onExcluir();
-    setExcluindo(false);
+    setErro("");
+    try {
+      await onExcluir();
+    } catch (err) {
+      setErro(mensagemErro(err, "Não foi possível excluir o evento."));
+    } finally {
+      setExcluindo(false);
+    }
   };
 
   return (
@@ -115,7 +129,9 @@ export default function EventoModal({ evento, dataInicial, onSalvar, onExcluir, 
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-semibold text-[#0B0F15] mb-1">Hora início</label>
+              <label className="block text-sm font-semibold text-[#0B0F15] mb-1">
+                Hora início <span className="font-normal text-[#9AA0A6]">(opcional)</span>
+              </label>
               <input
                 type="time"
                 value={form.hora_inicio ?? ""}
@@ -124,7 +140,9 @@ export default function EventoModal({ evento, dataInicial, onSalvar, onExcluir, 
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[#0B0F15] mb-1">Hora fim</label>
+              <label className="block text-sm font-semibold text-[#0B0F15] mb-1">
+                Hora fim <span className="font-normal text-[#9AA0A6]">(opcional)</span>
+              </label>
               <input
                 type="time"
                 value={form.hora_fim ?? ""}
@@ -152,6 +170,8 @@ export default function EventoModal({ evento, dataInicial, onSalvar, onExcluir, 
               className="w-full rounded-[12px] border border-[#EAECEF] px-3 py-2 text-sm text-[#0B0F15] bg-white resize-none focus:outline-none focus:ring-2 focus:ring-[#1E63FF]"
             />
           </div>
+
+          {erro && <p className="text-sm text-red-500">{erro}</p>}
 
           <div className="flex justify-between items-center gap-3 pt-2">
             {evento && onExcluir ? (

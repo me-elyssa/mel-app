@@ -6,6 +6,7 @@ import { X, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NUCLEO_COLORS } from "./colors";
+import { formInicial, mensagemErro, normalizarPayload } from "@/lib/formPayload";
 import type { CreateNucleoInput, Nucleo } from "@/types/entities";
 
 const STATUS_OPTS = [
@@ -30,10 +31,9 @@ interface NucleoFormProps {
 }
 
 export default function NucleoForm({ nucleo, onSalvar, onFechar }: NucleoFormProps) {
-  const [form, setForm] = useState<CreateNucleoInput>(
-    nucleo ? { ...defaultForm, ...nucleo } : defaultForm
-  );
+  const [form, setForm] = useState<CreateNucleoInput>(formInicial(defaultForm, nucleo));
   const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState("");
 
   const set = <K extends keyof CreateNucleoInput>(k: K, v: CreateNucleoInput[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -42,8 +42,14 @@ export default function NucleoForm({ nucleo, onSalvar, onFechar }: NucleoFormPro
     e.preventDefault();
     if (!form.titulo.trim()) return;
     setLoading(true);
-    await onSalvar(form);
-    setLoading(false);
+    setErro("");
+    try {
+      await onSalvar(normalizarPayload(form));
+    } catch (err) {
+      setErro(mensagemErro(err, "Não foi possível salvar o núcleo."));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -129,6 +135,8 @@ export default function NucleoForm({ nucleo, onSalvar, onFechar }: NucleoFormPro
               className="w-full rounded-[12px] border border-[#EAECEF] px-3 py-2 text-sm text-[#0B0F15] bg-white resize-none focus:outline-none focus:ring-2 focus:ring-[#1E63FF]"
             />
           </div>
+
+          {erro && <p className="text-sm text-red-500">{erro}</p>}
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="ghost" onClick={onFechar} className="text-[#6A7686]">

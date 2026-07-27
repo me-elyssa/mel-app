@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { TagInput } from "@/components/ui/tag-input";
 import { uploadFile } from "@/lib/storage";
 import { isGoogleDriveUrl } from "@/lib/googleDrive";
+import { formInicial, mensagemErro, normalizarPayload } from "@/lib/formPayload";
 import DriveFileCard from "@/components/shared/DriveFileCard";
 import type { CreateDocumentoInput, Documento } from "@/types/entities";
 
@@ -47,11 +48,10 @@ interface DocumentoFormProps {
 }
 
 export default function DocumentoForm({ documento, onSalvar, onFechar }: DocumentoFormProps) {
-  const [form, setForm] = useState<CreateDocumentoInput>(
-    documento ? { ...defaultForm, ...documento } : defaultForm
-  );
+  const [form, setForm] = useState<CreateDocumentoInput>(formInicial(defaultForm, documento));
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [erro, setErro] = useState("");
 
   const set = <K extends keyof CreateDocumentoInput>(k: K, v: CreateDocumentoInput[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -60,9 +60,12 @@ export default function DocumentoForm({ documento, onSalvar, onFechar }: Documen
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setErro("");
     try {
       const url = await uploadFile(file, "documentos", "uploads");
       set("file_url", url);
+    } catch (err) {
+      setErro(mensagemErro(err, "Erro ao enviar arquivo."));
     } finally {
       setUploading(false);
     }
@@ -72,8 +75,14 @@ export default function DocumentoForm({ documento, onSalvar, onFechar }: Documen
     e.preventDefault();
     if (!form.titulo.trim()) return;
     setLoading(true);
-    await onSalvar(form);
-    setLoading(false);
+    setErro("");
+    try {
+      await onSalvar(normalizarPayload(form));
+    } catch (err) {
+      setErro(mensagemErro(err, "Não foi possível salvar o documento."));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -199,6 +208,8 @@ export default function DocumentoForm({ documento, onSalvar, onFechar }: Documen
               className="w-full rounded-[12px] border border-[#EAECEF] px-3 py-2 text-sm text-[#0B0F15] bg-white resize-none focus:outline-none focus:ring-2 focus:ring-[#1E63FF]"
             />
           </div>
+
+          {erro && <p className="text-sm text-red-500">{erro}</p>}
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="ghost" onClick={onFechar} className="text-[#6A7686]">

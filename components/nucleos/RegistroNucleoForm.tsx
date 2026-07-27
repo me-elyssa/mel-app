@@ -5,6 +5,7 @@ import { Loader2, Paperclip, Type } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { uploadFile } from "@/lib/storage";
+import { mensagemErro } from "@/lib/formPayload";
 import type { CreateNotaInput, NotaTipo } from "@/types/entities";
 
 const TIPO_OPTS: { value: NotaTipo; label: string }[] = [
@@ -42,7 +43,7 @@ export default function RegistroNucleoForm({ nucleoId, onCriar }: RegistroNucleo
       setFileUrl(url);
       setFileName(file.name);
     } catch (err) {
-      setErroUpload(err instanceof Error ? err.message : "Erro ao enviar arquivo.");
+      setErroUpload(mensagemErro(err, "Erro ao enviar arquivo."));
     } finally {
       setUploading(false);
     }
@@ -52,20 +53,26 @@ export default function RegistroNucleoForm({ nucleoId, onCriar }: RegistroNucleo
     e.preventDefault();
     if (!conteudo.trim() && !fileUrl) return;
     setLoading(true);
-    await onCriar({
-      titulo: titulo || null,
-      conteudo: conteudo || null,
-      tipo,
-      nucleo_id: nucleoId,
-      processada: false,
-      file_url: fileUrl || null,
-      file_name: fileName || null,
-    });
-    setTitulo("");
-    setConteudo("");
-    setFileUrl("");
-    setFileName("");
-    setLoading(false);
+    setErroUpload("");
+    try {
+      await onCriar({
+        titulo: titulo || null,
+        conteudo: conteudo || null,
+        tipo,
+        nucleo_id: nucleoId,
+        processada: false,
+        file_url: fileUrl || null,
+        file_name: fileName || null,
+      });
+      setTitulo("");
+      setConteudo("");
+      setFileUrl("");
+      setFileName("");
+    } catch (err) {
+      setErroUpload(mensagemErro(err, "Não foi possível salvar a nota."));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
