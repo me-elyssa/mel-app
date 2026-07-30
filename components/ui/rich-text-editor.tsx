@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
+import { Extension } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
@@ -23,6 +24,59 @@ import {
 import { uploadFile } from "@/lib/storage";
 
 const TEXT_COLORS = ["#0B0F15", "#E03131", "#2F9E44", "#1971C2", "#F08C00", "#9C36B5"];
+
+const FONT_SIZES = [
+  { label: "Pequeno", value: "12px" },
+  { label: "Normal", value: "" },
+  { label: "Médio", value: "18px" },
+  { label: "Grande", value: "24px" },
+  { label: "Enorme", value: "32px" },
+];
+
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    fontSize: {
+      setFontSize: (fontSize: string) => ReturnType;
+      unsetFontSize: () => ReturnType;
+    };
+  }
+}
+
+const FontSize = Extension.create({
+  name: "fontSize",
+  addOptions() {
+    return { types: ["textStyle"] };
+  },
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          fontSize: {
+            default: null,
+            parseHTML: (element: HTMLElement) => element.style.fontSize || null,
+            renderHTML: (attributes: { fontSize?: string | null }) => {
+              if (!attributes.fontSize) return {};
+              return { style: `font-size: ${attributes.fontSize}` };
+            },
+          },
+        },
+      },
+    ];
+  },
+  addCommands() {
+    return {
+      setFontSize:
+        (fontSize: string) =>
+        ({ chain }) =>
+          chain().setMark("textStyle", { fontSize }).run(),
+      unsetFontSize:
+        () =>
+        ({ chain }) =>
+          chain().setMark("textStyle", { fontSize: null }).removeEmptyTextStyle().run(),
+    };
+  },
+});
 
 interface RichTextEditorProps {
   value: string;
@@ -101,6 +155,29 @@ function Toolbar({
       <ToolbarButton title="Itálico" active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()}>
         <Italic className="w-3.5 h-3.5" />
       </ToolbarButton>
+
+      <div className="w-px h-4 bg-[#EAECEF] mx-1" />
+
+      <select
+        title="Tamanho da fonte"
+        value={editor.getAttributes("textStyle").fontSize || ""}
+        onChange={(e) => {
+          const size = e.target.value;
+          if (size) {
+            editor.chain().focus().setFontSize(size).run();
+          } else {
+            editor.chain().focus().unsetFontSize().run();
+          }
+        }}
+        className="h-[26px] rounded-[6px] border border-[#EAECEF] bg-white px-1.5 text-xs text-[#545F6C] focus:outline-none focus:ring-1 focus:ring-[#1E63FF]"
+      >
+        {FONT_SIZES.map((s) => (
+          <option key={s.label} value={s.value}>
+            {s.label}
+          </option>
+        ))}
+      </select>
+
       <div className="w-px h-4 bg-[#EAECEF] mx-1" />
 
       <ToolbarButton title="Lista" active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()}>
@@ -215,6 +292,7 @@ export default function RichTextEditor({
       StarterKit,
       TextStyle,
       Color,
+      FontSize,
       Table.configure({ resizable: false }),
       TableRow,
       TableHeader,
