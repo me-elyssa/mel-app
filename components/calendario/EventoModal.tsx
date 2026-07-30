@@ -43,7 +43,11 @@ export default function EventoModal({ evento, dataInicial, onSalvar, onExcluir, 
     e.preventDefault();
     if (!form.titulo.trim() || !form.data) return;
     setLoading(true);
-    await onSalvar(form);
+    await onSalvar({
+      ...form,
+      hora_inicio: form.hora_inicio?.trim() ? form.hora_inicio : null,
+      hora_fim: form.hora_fim?.trim() ? form.hora_fim : null,
+    });
     setLoading(false);
   };
 
