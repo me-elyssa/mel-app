@@ -62,7 +62,11 @@ export default function TarefaForm({ tarefa, onSalvar, onFechar }: TarefaFormPro
     e.preventDefault();
     if (!form.titulo.trim()) return;
     setLoading(true);
-    await onSalvar(form);
+    await onSalvar({
+      ...form,
+      data_limite: form.data_limite?.trim() ? form.data_limite : null,
+      numero_processo: form.numero_processo?.trim() ? form.numero_processo : null,
+    });
     setLoading(false);
   };
 
