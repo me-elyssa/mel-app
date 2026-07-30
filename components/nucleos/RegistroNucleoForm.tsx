@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Loader2, Paperclip, Type } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import RichTextEditor from "@/components/ui/rich-text-editor";
+import { stripHtml } from "@/components/ui/rich-text-content";
 import { uploadFile } from "@/lib/storage";
 import type { CreateNotaInput, NotaTipo } from "@/types/entities";
 
@@ -50,7 +52,7 @@ export default function RegistroNucleoForm({ nucleoId, onCriar }: RegistroNucleo
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!conteudo.trim() && !fileUrl) return;
+    if (!stripHtml(conteudo) && !fileUrl) return;
     setLoading(true);
     await onCriar({
       titulo: titulo || null,
@@ -124,12 +126,12 @@ export default function RegistroNucleoForm({ nucleoId, onCriar }: RegistroNucleo
           {erroUpload && <p className="text-xs text-red-500">{erroUpload}</p>}
         </div>
       ) : (
-        <textarea
+        <RichTextEditor
           value={conteudo}
-          onChange={(e) => setConteudo(e.target.value)}
+          onChange={setConteudo}
           placeholder="Capture sua ideia..."
-          rows={2}
-          className="w-full rounded-[10px] border border-[#E6EAF0] px-3 py-2 text-sm text-[#0B0F15] bg-white resize-none focus:outline-none focus:ring-2 focus:ring-[#1E63FF]"
+          uploadBucket="notas"
+          uploadFolder="conteudo-imagens"
         />
       )}
 

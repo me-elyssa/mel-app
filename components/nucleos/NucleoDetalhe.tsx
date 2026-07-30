@@ -3,6 +3,7 @@
 import { ArrowLeft, Trash2, FileText, ExternalLink, Brain } from "lucide-react";
 import RegistroNucleoForm from "./RegistroNucleoForm";
 import { corDoNucleo } from "./colors";
+import { stripHtml } from "@/components/ui/rich-text-content";
 import { useNotas, useCreateNota, useDeleteNota } from "@/lib/hooks/useNotas";
 import { useDocumentosPorNucleo } from "@/lib/hooks/useDocumentos";
 import type { Nucleo } from "@/types/entities";
@@ -75,7 +76,9 @@ export default function NucleoDetalhe({ nucleo, onVoltar }: NucleoDetalheProps) 
                       </span>
                       {nota.titulo && <span className="text-sm font-semibold text-[#0B0F15] truncate">{nota.titulo}</span>}
                     </div>
-                    {nota.conteudo && <p className="text-sm text-[#545F6C] line-clamp-3">{nota.conteudo}</p>}
+                    {nota.conteudo && (
+                      <p className="text-sm text-[#545F6C] line-clamp-3">{stripHtml(nota.conteudo)}</p>
+                    )}
                     {nota.file_url && (
                       <a
                         href={nota.file_url}

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { stripHtml } from "@/components/ui/rich-text-content";
 import type { Documento, DocumentoArea, DocumentoTipo } from "@/types/entities";
 
 const AREA_COLORS: Record<DocumentoArea, { bg: string; text: string; label: string }> = {
@@ -80,7 +81,7 @@ export default function DocumentoCard({ documento, onEditar, onExcluir, onAbrir 
 
       {/* Descrição */}
       {documento.descricao && (
-        <p className="text-[#6A7686] text-sm leading-relaxed line-clamp-2">{documento.descricao}</p>
+        <p className="text-[#6A7686] text-sm leading-relaxed line-clamp-2">{stripHtml(documento.descricao)}</p>
       )}
 
       {/* Tags */}

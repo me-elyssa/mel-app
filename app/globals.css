@@ -87,3 +87,60 @@
     font-weight: 600;
   }
 }
+
+/* Editor de texto rico (TipTap) */
+.rich-text-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: #9aa0a6;
+  pointer-events: none;
+}
+
+.rich-text-content {
+  line-height: 1.6;
+}
+
+.rich-text-content p {
+  margin: 0.25rem 0;
+}
+
+.rich-text-content ul,
+.rich-text-content ol {
+  padding-left: 1.25rem;
+  margin: 0.25rem 0;
+}
+
+.rich-text-content ul {
+  list-style: disc;
+}
+
+.rich-text-content ol {
+  list-style: decimal;
+}
+
+.rich-text-content img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+}
+
+.rich-text-content table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+.rich-text-content th,
+.rich-text-content td {
+  border: 1px solid #eaecef;
+  padding: 6px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.rich-text-content th {
+  background-color: #f8f9fb;
+  font-weight: 600;
+}

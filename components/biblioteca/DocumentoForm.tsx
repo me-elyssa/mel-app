@@ -6,6 +6,7 @@ import { X, Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TagInput } from "@/components/ui/tag-input";
+import RichTextEditor from "@/components/ui/rich-text-editor";
 import { uploadFile } from "@/lib/storage";
 import { isGoogleDriveUrl } from "@/lib/googleDrive";
 import DriveFileCard from "@/components/shared/DriveFileCard";
@@ -192,11 +193,12 @@ export default function DocumentoForm({ documento, onSalvar, onFechar }: Documen
 
           <div>
             <label className="block text-sm font-semibold text-[#0B0F15] mb-1">Descrição</label>
-            <textarea
+            <RichTextEditor
               value={form.descricao ?? ""}
-              onChange={(e) => set("descricao", e.target.value)}
-              rows={3}
-              className="w-full rounded-[12px] border border-[#EAECEF] px-3 py-2 text-sm text-[#0B0F15] bg-white resize-none focus:outline-none focus:ring-2 focus:ring-[#1E63FF]"
+              onChange={(html) => set("descricao", html)}
+              placeholder="Escreva uma descrição..."
+              uploadBucket="documentos"
+              uploadFolder="descricao-imagens"
             />
           </div>
 

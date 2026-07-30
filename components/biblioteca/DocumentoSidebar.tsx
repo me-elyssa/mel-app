@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { X, ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { isGoogleDriveUrl } from "@/lib/googleDrive";
 import DriveFileCard from "@/components/shared/DriveFileCard";
+import RichTextContent from "@/components/ui/rich-text-content";
 import type { Documento } from "@/types/entities";
 
 const AREA_LABEL: Record<string, string> = {
@@ -87,7 +88,7 @@ export default function DocumentoSidebar({ documento, onFechar, onEditar, onExcl
             {documento.descricao && (
               <div>
                 <p className="text-xs font-semibold text-[#9AA0A6] uppercase mb-1">Descrição</p>
-                <p className="text-sm text-[#0B0F15] leading-relaxed">{documento.descricao}</p>
+                <RichTextContent html={documento.descricao} className="text-sm text-[#0B0F15]" />
               </div>
             )}
 
