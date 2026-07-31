@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { X, Loader2, Type, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import RichTextEditor from "@/components/ui/rich-text-editor";
 import { uploadFile } from "@/lib/storage";
 import { CATEGORIA_LABEL } from "./categoria-colors";
 import type { CreateRegistroPessoalInput, RegistroCategoria, RegistroPessoal } from "@/types/entities";
@@ -159,12 +160,12 @@ export default function RegistroForm({ registro, onSalvar, onFechar }: RegistroF
               {erroUpload && <p className="text-xs text-red-500">{erroUpload}</p>}
             </div>
           ) : (
-            <textarea
+            <RichTextEditor
               value={form.conteudo ?? ""}
-              onChange={(e) => set("conteudo", e.target.value)}
+              onChange={(html) => set("conteudo", html)}
               placeholder="Escreva aqui..."
-              rows={5}
-              className="w-full rounded-[12px] border border-[#EAECEF] px-3 py-2 text-sm text-[#0B0F15] bg-white resize-none focus:outline-none focus:ring-2 focus:ring-[#1E63FF]"
+              uploadBucket="registros"
+              uploadFolder="conteudo-imagens"
             />
           )}
 
