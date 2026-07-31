@@ -49,12 +49,14 @@ export default function BibliotecaPage() {
   const [aberto, setAberto] = useState<Documento | undefined>(undefined);
 
   const documentosFiltrados = useMemo(() => {
-    return documentos.filter((d) => {
-      const matchArea = areaAtiva === "todos" || d.area === areaAtiva;
-      const matchTipo = tipoAtivo === "todos" || d.tipo === tipoAtivo;
-      const matchBusca = d.titulo.toLowerCase().includes(filtroBusca.toLowerCase());
-      return matchArea && matchTipo && matchBusca;
-    });
+    return documentos
+      .filter((d) => {
+        const matchArea = areaAtiva === "todos" || d.area === areaAtiva;
+        const matchTipo = tipoAtivo === "todos" || d.tipo === tipoAtivo;
+        const matchBusca = d.titulo.toLowerCase().includes(filtroBusca.toLowerCase());
+        return matchArea && matchTipo && matchBusca;
+      })
+      .sort((a, b) => (b.ano ?? "").localeCompare(a.ano ?? ""));
   }, [documentos, areaAtiva, tipoAtivo, filtroBusca]);
 
   const handleSalvar = async (form: CreateDocumentoInput) => {

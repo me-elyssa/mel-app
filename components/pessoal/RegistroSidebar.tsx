@@ -1,6 +1,7 @@
 "use client";
 
 import PreviewSidebar from "@/components/shared/PreviewSidebar";
+import RichTextContent from "@/components/ui/rich-text-content";
 import { CATEGORIA_COLORS, CATEGORIA_LABEL } from "./categoria-colors";
 import type { RegistroPessoal } from "@/types/entities";
 
@@ -31,7 +32,7 @@ export default function RegistroSidebar({ registro, onFechar, onEditar, onExclui
       </div>
 
       {registro.conteudo && (
-        <p className="text-sm text-[#0B0F15] leading-relaxed whitespace-pre-wrap">{registro.conteudo}</p>
+        <RichTextContent html={registro.conteudo} className="text-sm text-[#0B0F15]" />
       )}
     </PreviewSidebar>
   );

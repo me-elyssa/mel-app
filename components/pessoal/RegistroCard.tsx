@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Pencil, Trash2, FileText } from "lucide-react";
+import { stripHtml } from "@/components/ui/rich-text-content";
 import { CATEGORIA_COLORS, CATEGORIA_LABEL } from "./categoria-colors";
 import type { RegistroPessoal } from "@/types/entities";
 
@@ -17,7 +18,7 @@ interface RegistroCardProps {
 export default function RegistroCard({ registro, onEditar, onExcluir, onVisualizar }: RegistroCardProps) {
   const [expandido, setExpandido] = useState(false);
   const cor = CATEGORIA_COLORS[registro.categoria];
-  const conteudo = registro.conteudo ?? "";
+  const conteudo = stripHtml(registro.conteudo ?? "");
   const precisaTruncar = conteudo.length > LIMITE;
   const textoExibido = expandido || !precisaTruncar ? conteudo : conteudo.slice(0, LIMITE) + "...";
 
