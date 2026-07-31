@@ -39,6 +39,7 @@ export default function RegistroForm({ registro, onSalvar, onFechar }: RegistroF
   const [modoArquivo, setModoArquivo] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [erroUpload, setErroUpload] = useState("");
 
   const set = <K extends keyof CreateRegistroPessoalInput>(k: K, v: CreateRegistroPessoalInput[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -47,10 +48,13 @@ export default function RegistroForm({ registro, onSalvar, onFechar }: RegistroF
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setErroUpload("");
     try {
       const url = await uploadFile(file, "registros", "uploads");
       set("file_url", url);
       set("file_name", file.name);
+    } catch (err) {
+      setErroUpload(err instanceof Error ? err.message : "Erro ao enviar arquivo.");
     } finally {
       setUploading(false);
     }
@@ -147,10 +151,13 @@ export default function RegistroForm({ registro, onSalvar, onFechar }: RegistroF
           </div>
 
           {modoArquivo ? (
-            <label className="flex items-center justify-center h-[48px] rounded-[12px] border border-dashed border-[#C7CDD6] bg-white cursor-pointer text-sm text-[#545F6C] hover:bg-[#F3F5F9]">
-              {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : form.file_name || "Escolher arquivo"}
-              <input type="file" className="hidden" onChange={handleFileChange} />
-            </label>
+            <div className="space-y-1">
+              <label className="flex items-center justify-center h-[48px] rounded-[12px] border border-dashed border-[#C7CDD6] bg-white cursor-pointer text-sm text-[#545F6C] hover:bg-[#F3F5F9]">
+                {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : form.file_name || "Escolher arquivo"}
+                <input type="file" className="hidden" onChange={handleFileChange} />
+              </label>
+              {erroUpload && <p className="text-xs text-red-500">{erroUpload}</p>}
+            </div>
           ) : (
             <textarea
               value={form.conteudo ?? ""}

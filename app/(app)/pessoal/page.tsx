@@ -5,6 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { Plus, User } from "lucide-react";
 import RegistroCard from "@/components/pessoal/RegistroCard";
 import RegistroForm from "@/components/pessoal/RegistroForm";
+import RegistroSidebar from "@/components/pessoal/RegistroSidebar";
 import { CATEGORIA_LABEL } from "@/components/pessoal/categoria-colors";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +33,7 @@ export default function PessoalPage() {
   const [categoriaAtiva, setCategoriaAtiva] = useState<RegistroCategoria | "todos">("todos");
   const [showForm, setShowForm] = useState(false);
   const [editando, setEditando] = useState<RegistroPessoal | undefined>(undefined);
+  const [visualizando, setVisualizando] = useState<RegistroPessoal | undefined>(undefined);
 
   const registrosFiltrados = useMemo(() => {
     if (categoriaAtiva === "todos") return registros;
@@ -97,10 +99,29 @@ export default function PessoalPage() {
                 setShowForm(true);
               }}
               onExcluir={() => deleteRegistro.mutate(registro.id)}
+              onVisualizar={() => setVisualizando(registro)}
             />
           ))}
         </div>
       )}
+
+      <AnimatePresence>
+        {visualizando && (
+          <RegistroSidebar
+            registro={visualizando}
+            onFechar={() => setVisualizando(undefined)}
+            onEditar={() => {
+              setEditando(visualizando);
+              setVisualizando(undefined);
+              setShowForm(true);
+            }}
+            onExcluir={() => {
+              deleteRegistro.mutate(visualizando.id);
+              setVisualizando(undefined);
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {showForm && (

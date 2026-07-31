@@ -1,12 +1,16 @@
 "use client";
 
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { ArrowLeft, Trash2, FileText, ExternalLink, Brain } from "lucide-react";
 import RegistroNucleoForm from "./RegistroNucleoForm";
+import NotaSidebar from "./NotaSidebar";
 import { corDoNucleo } from "./colors";
 import { stripHtml } from "@/components/ui/rich-text-content";
+import DocumentoSidebar from "@/components/biblioteca/DocumentoSidebar";
 import { useNotas, useCreateNota, useDeleteNota } from "@/lib/hooks/useNotas";
 import { useDocumentosPorNucleo } from "@/lib/hooks/useDocumentos";
-import type { Nucleo } from "@/types/entities";
+import type { Documento, Nota, Nucleo } from "@/types/entities";
 
 const NOTA_TIPO_LABEL: Record<string, string> = {
   ideia: "Ideia",
@@ -28,6 +32,8 @@ export default function NucleoDetalhe({ nucleo, onVoltar }: NucleoDetalheProps) 
   const { data: documentos = [] } = useDocumentosPorNucleo(nucleo.id);
   const createNota = useCreateNota();
   const deleteNota = useDeleteNota();
+  const [notaAberta, setNotaAberta] = useState<Nota | undefined>(undefined);
+  const [documentoAberto, setDocumentoAberto] = useState<Documento | undefined>(undefined);
 
   const cor = corDoNucleo(nucleo.titulo, nucleo.cor);
 
@@ -69,7 +75,7 @@ export default function NucleoDetalhe({ nucleo, onVoltar }: NucleoDetalheProps) 
                   key={nota.id}
                   className="bg-white border border-[#E6EAF0] rounded-[12px] p-3.5 flex items-start gap-3"
                 >
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setNotaAberta(nota)}>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F3F5F9] text-[#545F6C]">
                         {NOTA_TIPO_LABEL[nota.tipo] ?? nota.tipo}
@@ -80,15 +86,10 @@ export default function NucleoDetalhe({ nucleo, onVoltar }: NucleoDetalheProps) 
                       <p className="text-sm text-[#545F6C] line-clamp-3">{stripHtml(nota.conteudo)}</p>
                     )}
                     {nota.file_url && (
-                      <a
-                        href={nota.file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-[#1E63FF] hover:underline flex items-center gap-1 mt-1"
-                      >
+                      <span className="text-xs text-[#1E63FF] flex items-center gap-1 mt-1">
                         <ExternalLink className="w-3 h-3" />
                         {nota.file_name || "Arquivo"}
-                      </a>
+                      </span>
                     )}
                   </div>
                   <button
@@ -111,20 +112,39 @@ export default function NucleoDetalhe({ nucleo, onVoltar }: NucleoDetalheProps) 
               <p className="text-sm text-[#8A94A6] text-center py-6">Nenhum documento vinculado</p>
             ) : (
               documentos.map((doc) => (
-                <div key={doc.id} className="bg-white border border-[#E6EAF0] rounded-[12px] p-3.5 flex items-center gap-3">
+                <div
+                  key={doc.id}
+                  onClick={() => setDocumentoAberto(doc)}
+                  className="bg-white border border-[#E6EAF0] rounded-[12px] p-3.5 flex items-center gap-3 cursor-pointer hover:bg-[#F3F5F9]"
+                >
                   <FileText className="w-4 h-4 text-[#9AA0A6] flex-shrink-0" />
                   <span className="text-sm font-medium text-[#0B0F15] flex-1 truncate">{doc.titulo}</span>
-                  {doc.file_url && (
-                    <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="text-[#1E63FF] flex-shrink-0">
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  )}
+                  {doc.file_url && <ExternalLink className="w-3.5 h-3.5 text-[#1E63FF] flex-shrink-0" />}
                 </div>
               ))
             )}
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {notaAberta && (
+          <NotaSidebar
+            nota={notaAberta}
+            onFechar={() => setNotaAberta(undefined)}
+            onExcluir={() => {
+              deleteNota.mutate({ id: notaAberta.id, nucleoId: nucleo.id });
+              setNotaAberta(undefined);
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {documentoAberto && (
+          <DocumentoSidebar documento={documentoAberto} onFechar={() => setDocumentoAberto(undefined)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
