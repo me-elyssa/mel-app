@@ -11,9 +11,10 @@ interface RegistroCardProps {
   registro: RegistroPessoal;
   onEditar: () => void;
   onExcluir: () => void;
+  onVisualizar?: () => void;
 }
 
-export default function RegistroCard({ registro, onEditar, onExcluir }: RegistroCardProps) {
+export default function RegistroCard({ registro, onEditar, onExcluir, onVisualizar }: RegistroCardProps) {
   const [expandido, setExpandido] = useState(false);
   const cor = CATEGORIA_COLORS[registro.categoria];
   const conteudo = registro.conteudo ?? "";
@@ -46,7 +47,12 @@ export default function RegistroCard({ registro, onEditar, onExcluir }: Registro
         </div>
       </div>
 
-      <h3 className="text-[#0B0F15] text-base font-semibold leading-snug">{registro.titulo}</h3>
+      <h3
+        onClick={onVisualizar}
+        className={`text-[#0B0F15] text-base font-semibold leading-snug ${onVisualizar ? "cursor-pointer hover:text-[#1E63FF]" : ""}`}
+      >
+        {registro.titulo}
+      </h3>
 
       {conteudo && (
         <p className="text-[#545F6C] text-sm leading-relaxed whitespace-pre-wrap">
@@ -62,17 +68,26 @@ export default function RegistroCard({ registro, onEditar, onExcluir }: Registro
         </p>
       )}
 
-      {registro.file_url && (
-        <a
-          href={registro.file_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-xs font-medium text-[#1E63FF] hover:underline"
-        >
-          <FileText className="w-3.5 h-3.5" />
-          {registro.file_name || "Arquivo anexado"}
-        </a>
-      )}
+      {registro.file_url &&
+        (onVisualizar ? (
+          <button
+            onClick={onVisualizar}
+            className="flex items-center gap-1.5 text-xs font-medium text-[#1E63FF] hover:underline self-start"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            {registro.file_name || "Arquivo anexado"}
+          </button>
+        ) : (
+          <a
+            href={registro.file_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-xs font-medium text-[#1E63FF] hover:underline"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            {registro.file_name || "Arquivo anexado"}
+          </a>
+        ))}
     </div>
   );
 }
