@@ -518,7 +518,7 @@ export default function RichTextEditor({
   if (!editor) return null;
 
   return (
-    <div className="w-full rounded-[12px] border border-[#EAECEF] bg-white focus-within:ring-2 focus-within:ring-[#1E63FF] overflow-hidden">
+    <div className="w-full rounded-[12px] border border-[#EAECEF] bg-white focus-within:ring-2 focus-within:ring-[#1E63FF]">
       <Toolbar editor={editor} uploadBucket={uploadBucket} uploadFolder={uploadFolder} />
       <EditorContent editor={editor} />
     </div>

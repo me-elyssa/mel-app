@@ -59,10 +59,10 @@ export default function RegistroCard({ registro, onEditar, onExcluir, onVisualiz
           {textoExibido}{" "}
           {precisaTruncar && (
             <button
-              onClick={() => setExpandido((v) => !v)}
+              onClick={onVisualizar ?? (() => setExpandido((v) => !v))}
               className="text-[#1E63FF] font-semibold hover:underline"
             >
-              {expandido ? "Ver menos" : "Ver mais"}
+              {onVisualizar ? "Ver mais" : expandido ? "Ver menos" : "Ver mais"}
             </button>
           )}
         </p>
