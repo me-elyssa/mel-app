@@ -9,6 +9,12 @@ const PRIORIDADE_COLORS: Record<Tarefa["prioridade"], { bg: string; text: string
   alta: { bg: "#FEE2E2", text: "#B91C1C", label: "Alta" },
 };
 
+const COMPLEXIDADE_COLORS: Record<Tarefa["complexidade"], { bg: string; text: string; label: string }> = {
+  facil: { bg: "#E8F0FE", text: "#1E4FA0", label: "Fácil" },
+  media: { bg: "#EDE7F6", text: "#5E35B1", label: "Média" },
+  complexa: { bg: "#FCE4EC", text: "#AD1457", label: "Complexa" },
+};
+
 interface TarefaCardProps {
   tarefa: Tarefa;
   onEditar: () => void;
@@ -17,6 +23,7 @@ interface TarefaCardProps {
 
 export default function TarefaCard({ tarefa, onEditar, onExcluir }: TarefaCardProps) {
   const prioridade = PRIORIDADE_COLORS[tarefa.prioridade];
+  const complexidade = COMPLEXIDADE_COLORS[tarefa.complexidade];
 
   return (
     <div
@@ -24,7 +31,7 @@ export default function TarefaCard({ tarefa, onEditar, onExcluir }: TarefaCardPr
       className="bg-white border border-[#E6EAF0] rounded-[12px] p-4 flex flex-col gap-2 hover:shadow-[0_4px_12px_rgba(14,23,38,0.08)] transition-shadow group cursor-pointer"
     >
       <div className="flex items-start justify-between gap-2">
-        <h4 className="text-sm font-semibold text-[#0B0F15] leading-snug line-clamp-2">{tarefa.titulo}</h4>
+        <h4 className="text-sm font-semibold text-[#0B0F15] leading-snug line-clamp-2 flex-1">{tarefa.titulo}</h4>
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -36,12 +43,22 @@ export default function TarefaCard({ tarefa, onEditar, onExcluir }: TarefaCardPr
         </button>
       </div>
 
+      {tarefa.descricao && (
+        <p className="text-xs text-[#6A7686] leading-relaxed line-clamp-3">{tarefa.descricao}</p>
+      )}
+
       <div className="flex items-center gap-1.5 flex-wrap">
         <span
           className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
           style={{ backgroundColor: prioridade.bg, color: prioridade.text }}
         >
           {prioridade.label}
+        </span>
+        <span
+          className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+          style={{ backgroundColor: complexidade.bg, color: complexidade.text }}
+        >
+          {complexidade.label}
         </span>
         {tarefa.numero_processo && (
           <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#F3F5F9] text-[#545F6C] flex items-center gap-1">

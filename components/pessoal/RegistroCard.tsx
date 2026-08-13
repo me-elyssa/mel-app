@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Pencil, Trash2, FileText } from "lucide-react";
 import { stripHtml } from "@/components/ui/rich-text-content";
 import { CATEGORIA_COLORS, CATEGORIA_LABEL } from "./categoria-colors";
@@ -16,11 +15,10 @@ interface RegistroCardProps {
 }
 
 export default function RegistroCard({ registro, onEditar, onExcluir, onVisualizar }: RegistroCardProps) {
-  const [expandido, setExpandido] = useState(false);
   const cor = CATEGORIA_COLORS[registro.categoria];
   const conteudo = stripHtml(registro.conteudo ?? "");
   const precisaTruncar = conteudo.length > LIMITE;
-  const textoExibido = expandido || !precisaTruncar ? conteudo : conteudo.slice(0, LIMITE) + "...";
+  const textoExibido = precisaTruncar ? conteudo.slice(0, LIMITE) + "..." : conteudo;
 
   return (
     <div className="bg-white border border-[#E6EAF0] rounded-[16px] p-5 flex flex-col gap-3 group">
@@ -58,12 +56,12 @@ export default function RegistroCard({ registro, onEditar, onExcluir, onVisualiz
       {conteudo && (
         <p className="text-[#545F6C] text-sm leading-relaxed whitespace-pre-wrap">
           {textoExibido}{" "}
-          {precisaTruncar && (
+          {precisaTruncar && onVisualizar && (
             <button
-              onClick={() => setExpandido((v) => !v)}
+              onClick={onVisualizar}
               className="text-[#1E63FF] font-semibold hover:underline"
             >
-              {expandido ? "Ver menos" : "Ver mais"}
+              Ver mais
             </button>
           )}
         </p>
