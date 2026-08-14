@@ -8,7 +8,7 @@ import NotaSidebar from "./NotaSidebar";
 import { corDoNucleo } from "./colors";
 import { stripHtml } from "@/components/ui/rich-text-content";
 import DocumentoSidebar from "@/components/biblioteca/DocumentoSidebar";
-import { useNotas, useCreateNota, useDeleteNota } from "@/lib/hooks/useNotas";
+import { useNotas, useCreateNota, useUpdateNota, useDeleteNota } from "@/lib/hooks/useNotas";
 import { useDocumentosPorNucleo } from "@/lib/hooks/useDocumentos";
 import type { Documento, Nota, Nucleo } from "@/types/entities";
 
@@ -31,6 +31,7 @@ export default function NucleoDetalhe({ nucleo, onVoltar }: NucleoDetalheProps) 
   const { data: notas = [] } = useNotas(nucleo.id);
   const { data: documentos = [] } = useDocumentosPorNucleo(nucleo.id);
   const createNota = useCreateNota();
+  const updateNota = useUpdateNota();
   const deleteNota = useDeleteNota();
   const [notaAberta, setNotaAberta] = useState<Nota | undefined>(undefined);
   const [documentoAberto, setDocumentoAberto] = useState<Documento | undefined>(undefined);
@@ -135,6 +136,10 @@ export default function NucleoDetalhe({ nucleo, onVoltar }: NucleoDetalheProps) 
             onExcluir={() => {
               deleteNota.mutate({ id: notaAberta.id, nucleoId: nucleo.id });
               setNotaAberta(undefined);
+            }}
+            onSalvar={async (input) => {
+              const atualizada = await updateNota.mutateAsync({ id: notaAberta.id, ...input });
+              setNotaAberta(atualizada);
             }}
           />
         )}

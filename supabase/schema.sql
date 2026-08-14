@@ -98,3 +98,7 @@ create policy "Authenticated read/write documento" on documento for all using (a
 create policy "Authenticated read/write nota" on nota for all using (auth.role() = 'authenticated');
 create policy "Authenticated read/write registro_pessoal" on registro_pessoal for all using (auth.role() = 'authenticated');
 create policy "Authenticated read/write evento" on evento for all using (auth.role() = 'authenticated');
+
+-- Migração: miniatura de PDF em documento + conclusão de evento
+alter table documento add column if not exists thumbnail_url text;
+alter table evento add column if not exists concluido boolean not null default false;

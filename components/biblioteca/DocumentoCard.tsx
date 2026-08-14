@@ -39,8 +39,19 @@ export default function DocumentoCard({ documento, onEditar, onExcluir, onAbrir 
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96 }}
       onClick={onAbrir}
-      className="bg-white border border-[#E6EAF0] rounded-[16px] p-5 flex flex-col gap-3 hover:shadow-[0_4px_16px_rgba(14,23,38,0.08)] transition-shadow group cursor-pointer"
+      className="bg-white border border-[#E6EAF0] rounded-[16px] overflow-hidden flex flex-col gap-3 hover:shadow-[0_4px_16px_rgba(14,23,38,0.08)] transition-shadow group cursor-pointer"
     >
+      {/* Miniatura */}
+      {documento.thumbnail_url && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={documento.thumbnail_url}
+          alt=""
+          className="w-full aspect-[4/3] object-cover object-top bg-[#F3F5F9]"
+        />
+      )}
+
+      <div className={`p-5 flex flex-col gap-3 flex-1 ${documento.thumbnail_url ? "pt-3" : ""}`}>
       {/* Topo */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 flex-wrap">
@@ -108,6 +119,7 @@ export default function DocumentoCard({ documento, onEditar, onExcluir, onAbrir 
             Ver
           </span>
         )}
+      </div>
       </div>
     </motion.div>
   );

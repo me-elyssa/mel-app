@@ -30,6 +30,7 @@ export default function EventoModal({ evento, dataInicial, onSalvar, onExcluir, 
     tipo: "compromisso",
     local: "",
     tarefa_id: null,
+    concluido: false,
   };
 
   const [form, setForm] = useState<CreateEventoInput>(evento ? { ...defaultForm, ...evento } : defaultForm);
@@ -146,6 +147,16 @@ export default function EventoModal({ evento, dataInicial, onSalvar, onExcluir, 
               placeholder="Ex: Fórum Central, sala 4"
             />
           </div>
+
+          <label className="flex items-center gap-2 cursor-pointer w-fit">
+            <input
+              type="checkbox"
+              checked={form.concluido}
+              onChange={(e) => set("concluido", e.target.checked)}
+              className="w-4 h-4 rounded border-[#EAECEF] accent-[#1E63FF]"
+            />
+            <span className="text-sm font-semibold text-[#0B0F15]">Concluído</span>
+          </label>
 
           <div>
             <label className="block text-sm font-semibold text-[#0B0F15] mb-1">Descrição</label>
