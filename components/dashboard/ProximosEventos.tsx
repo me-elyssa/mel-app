@@ -5,11 +5,12 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Calendar, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { useEventos } from "@/lib/hooks/useEventos";
+import { useEventos, useUpdateEvento } from "@/lib/hooks/useEventos";
 import { TIPO_COLORS, TIPO_LABEL } from "@/components/calendario/evento-colors";
 
 export default function ProximosEventos() {
   const { data: eventos = [], isLoading } = useEventos();
+  const updateEvento = useUpdateEvento();
 
   const hoje = format(new Date(), "yyyy-MM-dd");
   const proximos = [...eventos]
@@ -58,20 +59,33 @@ export default function ProximosEventos() {
             const dataFmt = format(new Date(ev.data + "T00:00:00"), "EEE, d 'de' MMM", { locale: ptBR });
             const isHoje = ev.data === hoje;
             return (
-              <Link
+              <div
                 key={ev.id}
-                href="/calendario"
                 className="flex items-center gap-3 px-3 py-3 rounded-[12px] hover:bg-[#F8F9FB] transition-colors group"
               >
-                <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${c.dot}`} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#0B0F15] truncate group-hover:text-[#1E63FF] transition-colors">
+                <input
+                  type="checkbox"
+                  checked={ev.concluido}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    updateEvento.mutate({ id: ev.id, concluido: e.target.checked });
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-4 h-4 rounded border-[#EAECEF] accent-[#1E63FF] flex-shrink-0"
+                />
+                <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${c.dot} ${ev.concluido ? "opacity-40" : ""}`} />
+                <Link href="/calendario" className="flex-1 min-w-0">
+                  <p
+                    className={`text-sm font-semibold truncate group-hover:text-[#1E63FF] transition-colors ${
+                      ev.concluido ? "line-through text-[#8A94A6]" : "text-[#0B0F15]"
+                    }`}
+                  >
                     {ev.titulo}
                   </p>
                   <p className="text-xs text-[#8A94A6] capitalize">
                     {dataFmt}{ev.hora_inicio ? ` · ${ev.hora_inicio}` : ""}
                   </p>
-                </div>
+                </Link>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {isHoje && (
                     <span className="text-[10px] font-bold px-2 py-0.5 bg-[#D9FF63] text-[#0B0F15] rounded-full">
@@ -82,7 +96,7 @@ export default function ProximosEventos() {
                     {TIPO_LABEL[ev.tipo] || "Evento"}
                   </span>
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>

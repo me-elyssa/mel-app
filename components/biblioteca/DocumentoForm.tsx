@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TagInput } from "@/components/ui/tag-input";
 import RichTextEditor from "@/components/ui/rich-text-editor";
-import { uploadFile } from "@/lib/storage";
+import { uploadFile, generatePdfThumbnail } from "@/lib/storage";
 import { isGoogleDriveUrl } from "@/lib/googleDrive";
 import DriveFileCard from "@/components/shared/DriveFileCard";
 import type { CreateDocumentoInput, Documento } from "@/types/entities";
@@ -35,6 +35,7 @@ const defaultForm: CreateDocumentoInput = {
   area: "pesquisa",
   tipo: "pdf",
   file_url: "",
+  thumbnail_url: "",
   autores: "",
   ano: "",
   tags: [],
@@ -68,9 +69,20 @@ export default function DocumentoForm({ documento, onSalvar, onFechar }: Documen
       set("file_url", url);
     } catch (err) {
       setErroUpload(err instanceof Error ? err.message : "Erro ao enviar arquivo.");
-    } finally {
       setUploading(false);
+      return;
     }
+
+    if (file.type === "application/pdf") {
+      try {
+        const thumbUrl = await generatePdfThumbnail(file, "documentos", "thumbnails");
+        set("thumbnail_url", thumbUrl);
+      } catch {
+        // Miniatura é cosmética — falha aqui não deve bloquear o upload do documento.
+      }
+    }
+
+    setUploading(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

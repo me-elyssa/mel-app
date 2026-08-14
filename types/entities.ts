@@ -48,6 +48,7 @@ export interface Documento {
   area: DocumentoArea;
   tipo: DocumentoTipo;
   file_url: string | null;
+  thumbnail_url: string | null;
   autores: string | null;
   ano: string | null;
   tags: string[] | null;
@@ -120,6 +121,7 @@ export interface Evento {
   tipo: EventoTipo;
   local: string | null;
   tarefa_id: string | null;
+  concluido: boolean;
   created_at: string;
   updated_at: string;
 }

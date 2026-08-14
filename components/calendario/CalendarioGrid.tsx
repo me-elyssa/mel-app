@@ -95,7 +95,9 @@ export default function CalendarioGrid({
                 {eventosDia.slice(0, 3).map((ev) => (
                   <span
                     key={ev.id}
-                    className={`w-1.5 h-1.5 rounded-full ${selecionado ? "bg-white" : TIPO_COLORS[ev.tipo]?.dot ?? TIPO_COLORS.outro.dot}`}
+                    className={`w-1.5 h-1.5 rounded-full ${selecionado ? "bg-white" : TIPO_COLORS[ev.tipo]?.dot ?? TIPO_COLORS.outro.dot} ${
+                      ev.concluido ? "opacity-40" : ""
+                    }`}
                   />
                 ))}
                 {tarefasDia.length > 0 && (
