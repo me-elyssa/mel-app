@@ -8,6 +8,7 @@ import StatsCard from "@/components/dashboard/StatsCard";
 import KanbanBoard from "@/components/dashboard/KanbanBoard";
 import TarefaForm from "@/components/dashboard/TarefaForm";
 import ProximosEventos from "@/components/dashboard/ProximosEventos";
+import AtencaoAgora from "@/components/dashboard/AtencaoAgora";
 import { Button } from "@/components/ui/button";
 import { useDocumentos } from "@/lib/hooks/useDocumentos";
 import { useNucleos } from "@/lib/hooks/useNucleos";
@@ -60,6 +61,8 @@ export default function DashboardPage() {
         <h1 className="text-[#0B0F15]">Bem-vinda</h1>
         <p className="text-[#6A7686] text-sm mt-1">Aqui está o resumo do seu dia.</p>
       </div>
+
+      <AtencaoAgora />
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Link href="/biblioteca">

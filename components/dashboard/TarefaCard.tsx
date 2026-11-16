@@ -69,9 +69,16 @@ export default function TarefaCard({ tarefa, onEditar, onExcluir }: TarefaCardPr
       </div>
 
       {tarefa.data_limite && (
-        <div className="flex items-center gap-1 text-xs text-[#8A94A6]">
+        <div
+          className={`flex items-center gap-1 text-xs ${
+            tarefa.status !== "concluido" && tarefa.data_limite < new Date().toLocaleDateString("sv-SE")
+              ? "text-[#B91C1C] font-semibold"
+              : "text-[#8A94A6]"
+          }`}
+        >
           <Calendar className="w-3.5 h-3.5" />
           {new Date(tarefa.data_limite + "T00:00:00").toLocaleDateString("pt-BR")}
+          {tarefa.status !== "concluido" && tarefa.data_limite < new Date().toLocaleDateString("sv-SE") && " · atrasada"}
         </div>
       )}
 
