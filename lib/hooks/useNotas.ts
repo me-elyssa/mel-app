@@ -18,6 +18,20 @@ export function useNotas(nucleoId: string) {
   });
 }
 
+export function useNotasPendentes() {
+  return useQuery({
+    queryKey: ["notas-pendentes"],
+    queryFn: async (): Promise<Pick<Nota, "id" | "nucleo_id">[]> => {
+      const { data, error } = await supabase
+        .from("nota")
+        .select("id, nucleo_id")
+        .eq("processada", false);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
 export function useCreateNota() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -26,7 +40,10 @@ export function useCreateNota() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => queryClient.invalidateQueries({ queryKey: ["notas-nucleo", data.nucleo_id] }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["notas-nucleo", data.nucleo_id] });
+      queryClient.invalidateQueries({ queryKey: ["notas-pendentes"] });
+    },
   });
 }
 
@@ -38,7 +55,10 @@ export function useUpdateNota() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => queryClient.invalidateQueries({ queryKey: ["notas-nucleo", data.nucleo_id] }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["notas-nucleo", data.nucleo_id] });
+      queryClient.invalidateQueries({ queryKey: ["notas-pendentes"] });
+    },
   });
 }
 
@@ -49,7 +69,9 @@ export function useDeleteNota() {
       const { error } = await supabase.from("nota").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: (_data, variables) =>
-      queryClient.invalidateQueries({ queryKey: ["notas-nucleo", variables.nucleoId] }),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["notas-nucleo", variables.nucleoId] });
+      queryClient.invalidateQueries({ queryKey: ["notas-pendentes"] });
+    },
   });
 }

@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { differenceInCalendarDays, format } from "date-fns";
-import { AlertTriangle, BellRing, CheckCircle2, ClipboardList, Calendar } from "lucide-react";
+import { AlertTriangle, BellRing, Brain, CheckCircle2, ClipboardList, Calendar, StickyNote } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEventos } from "@/lib/hooks/useEventos";
 import { useTarefas } from "@/lib/hooks/useTarefas";
+import { useNucleos } from "@/lib/hooks/useNucleos";
+import { useNotasPendentes } from "@/lib/hooks/useNotas";
+import { DIAS_REVISAO, diasSemRevisao, revisaoAtrasada } from "@/lib/revisao";
 
 const JANELA_DIAS = 3;
 
@@ -44,6 +47,8 @@ function classificar(dias: number): Urgencia | null {
 export default function AtencaoAgora() {
   const { data: tarefas = [] } = useTarefas();
   const { data: eventos = [] } = useEventos();
+  const { data: nucleos = [] } = useNucleos();
+  const { data: notasPendentes = [] } = useNotasPendentes();
 
   const hoje = new Date();
   const hojeStr = format(hoje, "yyyy-MM-dd");
@@ -69,6 +74,10 @@ export default function AtencaoAgora() {
 
   itens.sort((a, b) => a.dias - b.dias || (a.hora ?? "").localeCompare(b.hora ?? ""));
 
+  const nucleosParaRevisar = nucleos
+    .filter(revisaoAtrasada)
+    .sort((a, b) => diasSemRevisao(b) - diasSemRevisao(a));
+
   const atrasados = itens.filter((i) => i.urgencia === "atrasado").length;
 
   return (
@@ -90,10 +99,10 @@ export default function AtencaoAgora() {
         )}
       </div>
 
-      {itens.length === 0 ? (
+      {itens.length === 0 && nucleosParaRevisar.length === 0 && notasPendentes.length === 0 ? (
         <div className="flex items-center gap-2 text-sm text-[#8A94A6] py-2">
           <CheckCircle2 className="w-4 h-4 text-[#2E7D32]" />
-          Nada vencendo nos próximos {JANELA_DIAS} dias.
+          Nada pendente por enquanto.
         </div>
       ) : (
         <div className="space-y-2">
@@ -124,6 +133,41 @@ export default function AtencaoAgora() {
               </Link>
             );
           })}
+
+          {notasPendentes.length > 0 && (
+            <Link
+              href="/nucleos"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] hover:bg-[#F8F9FB] transition-colors"
+            >
+              <StickyNote className="w-4 h-4 text-[#8A94A6] flex-shrink-0" />
+              <p className="flex-1 min-w-0 text-sm font-semibold text-[#0B0F15] truncate">
+                {notasPendentes.length}{" "}
+                {notasPendentes.length === 1 ? "nota aguardando processamento" : "notas aguardando processamento"}
+              </p>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#B45309]">
+                Pendente
+              </span>
+            </Link>
+          )}
+
+          {nucleosParaRevisar.map((n) => (
+            <Link
+              key={`nucleo-${n.id}`}
+              href="/nucleos"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] hover:bg-[#F8F9FB] transition-colors"
+            >
+              <Brain className="w-4 h-4 text-[#8A94A6] flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-[#0B0F15] truncate">{n.titulo}</p>
+                <p className="text-xs text-[#8A94A6]">
+                  {n.ultima_revisao ? "Sem revisão" : "Nunca revisado"} há mais de {DIAS_REVISAO} dias
+                </p>
+              </div>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#EDE7F6] text-[#5E35B1] flex-shrink-0">
+                Revisar
+              </span>
+            </Link>
+          ))}
         </div>
       )}
     </motion.div>

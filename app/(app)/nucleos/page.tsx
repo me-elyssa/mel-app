@@ -7,6 +7,7 @@ import NucleoCard from "@/components/nucleos/NucleoCard";
 import NucleoForm from "@/components/nucleos/NucleoForm";
 import NucleoDetalhe from "@/components/nucleos/NucleoDetalhe";
 import { Button } from "@/components/ui/button";
+import { useNotasPendentes } from "@/lib/hooks/useNotas";
 import { useNucleos, useCreateNucleo, useUpdateNucleo, useDeleteNucleo } from "@/lib/hooks/useNucleos";
 import type { CreateNucleoInput, Nucleo } from "@/types/entities";
 
@@ -16,7 +17,10 @@ export default function NucleosPage() {
   const updateNucleo = useUpdateNucleo();
   const deleteNucleo = useDeleteNucleo();
 
-  const [selecionado, setSelecionado] = useState<Nucleo | undefined>(undefined);
+  const { data: pendentes = [] } = useNotasPendentes();
+  const [selecionadoId, setSelecionadoId] = useState<string | undefined>(undefined);
+  const selecionado = nucleos.find((n) => n.id === selecionadoId);
+  const setSelecionado = (n: Nucleo | undefined) => setSelecionadoId(n?.id);
   const [showForm, setShowForm] = useState(false);
   const [editando, setEditando] = useState<Nucleo | undefined>(undefined);
 
@@ -69,6 +73,7 @@ export default function NucleosPage() {
             <NucleoCard
               key={nucleo.id}
               nucleo={nucleo}
+              notasPendentes={pendentes.filter((p) => p.nucleo_id === nucleo.id).length}
               onAbrir={() => setSelecionado(nucleo)}
               onEditar={() => {
                 setEditando(nucleo);

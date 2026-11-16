@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import { ArrowLeft, Trash2, FileText, ExternalLink, Brain } from "lucide-react";
+import { ArrowLeft, Trash2, FileText, ExternalLink, Brain, CheckCircle2, Circle, RefreshCw } from "lucide-react";
 import RegistroNucleoForm from "./RegistroNucleoForm";
 import NotaSidebar from "./NotaSidebar";
 import { corDoNucleo } from "./colors";
@@ -10,6 +10,8 @@ import { stripHtml } from "@/components/ui/rich-text-content";
 import DocumentoSidebar from "@/components/biblioteca/DocumentoSidebar";
 import { useNotas, useCreateNota, useUpdateNota, useDeleteNota } from "@/lib/hooks/useNotas";
 import { useDocumentosPorNucleo } from "@/lib/hooks/useDocumentos";
+import { useUpdateNucleo } from "@/lib/hooks/useNucleos";
+import { revisaoAtrasada, textoUltimaRevisao } from "@/lib/revisao";
 import type { Documento, Nota, Nucleo } from "@/types/entities";
 
 const NOTA_TIPO_LABEL: Record<string, string> = {
@@ -33,10 +35,12 @@ export default function NucleoDetalhe({ nucleo, onVoltar }: NucleoDetalheProps) 
   const createNota = useCreateNota();
   const updateNota = useUpdateNota();
   const deleteNota = useDeleteNota();
+  const updateNucleo = useUpdateNucleo();
   const [notaAberta, setNotaAberta] = useState<Nota | undefined>(undefined);
   const [documentoAberto, setDocumentoAberto] = useState<Documento | undefined>(undefined);
 
   const cor = corDoNucleo(nucleo.titulo, nucleo.cor);
+  const atrasada = revisaoAtrasada(nucleo);
 
   return (
     <div className="space-y-6">
@@ -59,6 +63,19 @@ export default function NucleoDetalhe({ nucleo, onVoltar }: NucleoDetalheProps) 
           <h1 className="text-[#0B0F15]">{nucleo.titulo}</h1>
           {nucleo.descricao && <p className="text-[#6A7686] text-sm mt-0.5">{nucleo.descricao}</p>}
         </div>
+        <div className="ml-auto flex flex-col items-end gap-1 flex-shrink-0">
+          <button
+            onClick={() => updateNucleo.mutate({ id: nucleo.id, ultima_revisao: new Date().toISOString() })}
+            disabled={updateNucleo.isPending}
+            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-[10px] border border-[#E6EAF0] hover:bg-[#F3F5F9] text-[#0B0F15] disabled:opacity-50"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Marcar como revisado
+          </button>
+          <span className={`text-[11px] ${atrasada ? "text-[#B91C1C] font-semibold" : "text-[#8A94A6]"}`}>
+            {textoUltimaRevisao(nucleo)}
+          </span>
+        </div>
       </div>
 
       <div className="space-y-8">
@@ -76,6 +93,17 @@ export default function NucleoDetalhe({ nucleo, onVoltar }: NucleoDetalheProps) 
                   key={nota.id}
                   className="bg-white border border-[#E6EAF0] rounded-[12px] p-3.5 flex items-start gap-3"
                 >
+                  <button
+                    onClick={() => updateNota.mutate({ id: nota.id, processada: !nota.processada })}
+                    title={nota.processada ? "Marcar como pendente" : "Marcar como processada"}
+                    className="mt-0.5 flex-shrink-0 text-[#9AA0A6] hover:text-[#2E7D32]"
+                  >
+                    {nota.processada ? (
+                      <CheckCircle2 className="w-4 h-4 text-[#2E7D32]" />
+                    ) : (
+                      <Circle className="w-4 h-4" />
+                    )}
+                  </button>
                   <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setNotaAberta(nota)}>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F3F5F9] text-[#545F6C]">

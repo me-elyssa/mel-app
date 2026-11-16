@@ -2,6 +2,7 @@
 
 import { Brain, Pencil, Trash2 } from "lucide-react";
 import { corDoNucleo } from "./colors";
+import { revisaoAtrasada } from "@/lib/revisao";
 import type { Nucleo } from "@/types/entities";
 
 const STATUS_LABEL: Record<Nucleo["status"], string> = {
@@ -12,13 +13,15 @@ const STATUS_LABEL: Record<Nucleo["status"], string> = {
 
 interface NucleoCardProps {
   nucleo: Nucleo;
+  notasPendentes?: number;
   onAbrir: () => void;
   onEditar: () => void;
   onExcluir: () => void;
 }
 
-export default function NucleoCard({ nucleo, onAbrir, onEditar, onExcluir }: NucleoCardProps) {
+export default function NucleoCard({ nucleo, notasPendentes = 0, onAbrir, onEditar, onExcluir }: NucleoCardProps) {
   const cor = corDoNucleo(nucleo.titulo, nucleo.cor);
+  const atrasada = revisaoAtrasada(nucleo);
 
   return (
     <div
@@ -58,6 +61,21 @@ export default function NucleoCard({ nucleo, onAbrir, onEditar, onExcluir }: Nuc
 
       {nucleo.descricao && (
         <p className="text-[#6A7686] text-sm leading-relaxed line-clamp-2">{nucleo.descricao}</p>
+      )}
+
+      {(atrasada || notasPendentes > 0) && (
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {atrasada && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FEE2E2] text-[#B91C1C]">
+              Revisão atrasada
+            </span>
+          )}
+          {notasPendentes > 0 && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#B45309]">
+              {notasPendentes} {notasPendentes === 1 ? "nota pendente" : "notas pendentes"}
+            </span>
+          )}
+        </div>
       )}
 
       <div className="flex items-center gap-2 mt-auto pt-2 border-t border-[#F3F5F9]">
