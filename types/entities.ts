@@ -13,6 +13,12 @@ export interface Nucleo {
 export type CreateNucleoInput = Omit<Nucleo, "id" | "created_at" | "updated_at">;
 export type UpdateNucleoInput = Partial<CreateNucleoInput>;
 
+export interface TarefaAnexo {
+  tipo: "arquivo" | "link";
+  url: string;
+  nome: string;
+}
+
 export interface Tarefa {
   id: string;
   titulo: string;
@@ -24,6 +30,7 @@ export interface Tarefa {
   numero_processo: string | null;
   data_limite: string | null;
   nucleo_id: string | null;
+  anexos: TarefaAnexo[];
   created_at: string;
   updated_at: string;
 }

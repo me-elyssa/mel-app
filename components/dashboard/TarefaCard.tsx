@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, FileText, Pencil, Trash2 } from "lucide-react";
+import { Calendar, FileText, Link2, Paperclip, Pencil, Trash2 } from "lucide-react";
 import type { Tarefa } from "@/types/entities";
 
 const PRIORIDADE_COLORS: Record<Tarefa["prioridade"], { bg: string; text: string; label: string }> = {
@@ -67,6 +67,32 @@ export default function TarefaCard({ tarefa, onEditar, onExcluir }: TarefaCardPr
           </span>
         )}
       </div>
+
+      {tarefa.anexos?.length > 0 && (
+        <div className="flex flex-col gap-1">
+          {tarefa.anexos.slice(0, 3).map((anexo, i) => (
+            <a
+              key={`${anexo.url}-${i}`}
+              href={anexo.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              title={anexo.url}
+              className="flex items-center gap-1.5 text-xs text-[#1E63FF] hover:underline min-w-0"
+            >
+              {anexo.tipo === "link" ? (
+                <Link2 className="w-3.5 h-3.5 flex-shrink-0" />
+              ) : (
+                <Paperclip className="w-3.5 h-3.5 flex-shrink-0" />
+              )}
+              <span className="truncate">{anexo.nome}</span>
+            </a>
+          ))}
+          {tarefa.anexos.length > 3 && (
+            <span className="text-[10px] text-[#8A94A6]">+{tarefa.anexos.length - 3} anexo(s)</span>
+          )}
+        </div>
+      )}
 
       {tarefa.data_limite && (
         <div className="flex items-center gap-1 text-xs text-[#8A94A6]">

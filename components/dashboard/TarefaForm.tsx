@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import AnexosField from "./AnexosField";
 import type { CreateTarefaInput, Tarefa } from "@/types/entities";
 
 const STATUS_OPTS = [
@@ -41,6 +42,7 @@ const defaultForm: CreateTarefaInput = {
   numero_processo: "",
   data_limite: "",
   nucleo_id: null,
+  anexos: [],
 };
 
 interface TarefaFormProps {
@@ -51,9 +53,10 @@ interface TarefaFormProps {
 
 export default function TarefaForm({ tarefa, onSalvar, onFechar }: TarefaFormProps) {
   const [form, setForm] = useState<CreateTarefaInput>(
-    tarefa ? { ...defaultForm, ...tarefa } : defaultForm
+    tarefa ? { ...defaultForm, ...tarefa, anexos: tarefa.anexos ?? [] } : defaultForm
   );
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const set = <K extends keyof CreateTarefaInput>(k: K, v: CreateTarefaInput[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -203,6 +206,13 @@ export default function TarefaForm({ tarefa, onSalvar, onFechar }: TarefaFormPro
             />
           </div>
 
+          {/* Anexos */}
+          <AnexosField
+            value={form.anexos}
+            onChange={(anexos) => set("anexos", anexos)}
+            onUploadingChange={setUploading}
+          />
+
           {/* Ações */}
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="ghost" onClick={onFechar} className="text-[#6A7686]">
@@ -210,7 +220,7 @@ export default function TarefaForm({ tarefa, onSalvar, onFechar }: TarefaFormPro
             </Button>
             <Button
               type="submit"
-              disabled={loading || !form.titulo.trim()}
+              disabled={loading || uploading || !form.titulo.trim()}
               className="h-[44px] px-6"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : tarefa ? "Salvar" : "Criar tarefa"}

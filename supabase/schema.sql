@@ -102,3 +102,6 @@ create policy "Authenticated read/write evento" on evento for all using (auth.ro
 -- Migração: miniatura de PDF em documento + conclusão de evento
 alter table documento add column if not exists thumbnail_url text;
 alter table evento add column if not exists concluido boolean not null default false;
+
+-- Migração: anexos (arquivos e links) nas tarefas do kanban
+alter table tarefa add column if not exists anexos jsonb not null default '[]'::jsonb;
