@@ -1,5 +1,6 @@
 "use client";
 
+import { stripHtml } from "@/components/ui/rich-text-content";
 import { Brain, Pencil, Trash2 } from "lucide-react";
 import { corDoNucleo } from "./colors";
 import type { Nucleo } from "@/types/entities";
@@ -57,7 +58,7 @@ export default function NucleoCard({ nucleo, onAbrir, onEditar, onExcluir }: Nuc
       <h3 className="text-[#0B0F15] text-base font-semibold leading-snug line-clamp-2">{nucleo.titulo}</h3>
 
       {nucleo.descricao && (
-        <p className="text-[#6A7686] text-sm leading-relaxed line-clamp-2">{nucleo.descricao}</p>
+        <p className="text-[#6A7686] text-sm leading-relaxed line-clamp-2">{stripHtml(nucleo.descricao)}</p>
       )}
 
       <div className="flex items-center gap-2 mt-auto pt-2 border-t border-[#F3F5F9]">

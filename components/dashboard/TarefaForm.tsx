@@ -1,5 +1,6 @@
 "use client";
 
+import RichTextEditor from "@/components/ui/rich-text-editor";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { X, Loader2 } from "lucide-react";
@@ -194,12 +195,10 @@ export default function TarefaForm({ tarefa, onSalvar, onFechar }: TarefaFormPro
           {/* Descrição */}
           <div>
             <label className="block text-sm font-semibold text-[#0B0F15] mb-1">Descrição / Observações</label>
-            <textarea
+            <RichTextEditor
               value={form.descricao ?? ""}
-              onChange={(e) => set("descricao", e.target.value)}
+              onChange={(html) => set("descricao", html)}
               placeholder="Contexto, observações relevantes..."
-              rows={3}
-              className="w-full rounded-[12px] border border-[#EAECEF] px-3 py-2 text-sm text-[#0B0F15] bg-white resize-none focus:outline-none focus:ring-2 focus:ring-[#1E63FF]"
             />
           </div>
 

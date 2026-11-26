@@ -6,7 +6,7 @@ import { ArrowLeft, Trash2, FileText, ExternalLink, Brain } from "lucide-react";
 import RegistroNucleoForm from "./RegistroNucleoForm";
 import NotaSidebar from "./NotaSidebar";
 import { corDoNucleo } from "./colors";
-import { stripHtml } from "@/components/ui/rich-text-content";
+import RichTextContent, { stripHtml } from "@/components/ui/rich-text-content";
 import DocumentoSidebar from "@/components/biblioteca/DocumentoSidebar";
 import { useNotas, useCreateNota, useUpdateNota, useDeleteNota } from "@/lib/hooks/useNotas";
 import { useDocumentosPorNucleo } from "@/lib/hooks/useDocumentos";
@@ -57,7 +57,7 @@ export default function NucleoDetalhe({ nucleo, onVoltar }: NucleoDetalheProps) 
         </div>
         <div>
           <h1 className="text-[#0B0F15]">{nucleo.titulo}</h1>
-          {nucleo.descricao && <p className="text-[#6A7686] text-sm mt-0.5">{nucleo.descricao}</p>}
+          {nucleo.descricao && <RichTextContent html={nucleo.descricao} className="text-[#6A7686] text-sm mt-0.5" />}
         </div>
       </div>
 

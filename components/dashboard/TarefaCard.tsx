@@ -1,5 +1,6 @@
 "use client";
 
+import { stripHtml } from "@/components/ui/rich-text-content";
 import { Calendar, FileText, Pencil, Trash2 } from "lucide-react";
 import type { Tarefa } from "@/types/entities";
 
@@ -44,7 +45,7 @@ export default function TarefaCard({ tarefa, onEditar, onExcluir }: TarefaCardPr
       </div>
 
       {tarefa.descricao && (
-        <p className="text-xs text-[#6A7686] leading-relaxed line-clamp-3">{tarefa.descricao}</p>
+        <p className="text-xs text-[#6A7686] leading-relaxed line-clamp-3">{stripHtml(tarefa.descricao)}</p>
       )}
 
       <div className="flex items-center gap-1.5 flex-wrap">
