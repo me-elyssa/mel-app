@@ -128,24 +128,3 @@ export interface Evento {
 
 export type CreateEventoInput = Omit<Evento, "id" | "created_at" | "updated_at">;
 export type UpdateEventoInput = Partial<CreateEventoInput>;
-
-export interface EdcmDia {
-  id: string;
-  data: string;
-  dia_semana: string | null;
-  feito: boolean;
-  bloco1: string | null;
-  bloco2: string | null;
-  bloco3: string | null;
-  questoes: number;
-  acertos: number;
-  fase: string | null;
-  horas: number;
-  segundos_estudados: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export type UpdateEdcmDiaInput = Partial<
-  Pick<EdcmDia, "feito" | "bloco1" | "bloco2" | "bloco3" | "questoes" | "acertos" | "fase" | "horas" | "segundos_estudados">
->;

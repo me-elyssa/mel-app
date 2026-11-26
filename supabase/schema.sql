@@ -102,24 +102,3 @@ create policy "Authenticated read/write evento" on evento for all using (auth.ro
 -- Migração: miniatura de PDF em documento + conclusão de evento
 alter table documento add column if not exists thumbnail_url text;
 alter table evento add column if not exists concluido boolean not null default false;
-
--- Cronograma EDCM (especialização para magistratura): coleção própria, uma linha por dia de estudo
-create table if not exists edcm_dia (
-  id uuid primary key default uuid_generate_v4(),
-  data date not null unique,
-  dia_semana text,
-  feito boolean not null default false,
-  bloco1 text,
-  bloco2 text,
-  bloco3 text,
-  questoes integer not null default 0,
-  acertos integer not null default 0,
-  fase text,
-  horas numeric not null default 3,
-  segundos_estudados integer not null default 0,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
-
-alter table edcm_dia enable row level security;
-create policy "Authenticated read/write edcm_dia" on edcm_dia for all using (auth.role() = 'authenticated');
