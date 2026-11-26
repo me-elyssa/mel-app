@@ -13,11 +13,13 @@ import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
+import { TaskList, TaskItem } from "@tiptap/extension-list";
 import {
   Bold,
   Italic,
   List,
   ListOrdered,
+  ListChecks,
   Table as TableIcon,
   Image as ImageIcon,
   Loader2,
@@ -247,6 +249,10 @@ function Toolbar({
       </ToolbarButton>
       <ToolbarButton title="Lista numerada" active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
         <ListOrdered className="w-3.5 h-3.5" />
+      </ToolbarButton>
+
+      <ToolbarButton title="Lista de tarefas (caixas de seleção)" active={editor.isActive("taskList")} onClick={() => editor.chain().focus().toggleTaskList().run()}>
+        <ListChecks className="w-3.5 h-3.5" />
       </ToolbarButton>
 
       <div className="w-px h-4 bg-[#EAECEF] mx-1" />
@@ -504,6 +510,8 @@ export default function RichTextEditor({
       TableHeader,
       TableCell,
       Image,
+      TaskList,
+      TaskItem.configure({ nested: true }),
       Placeholder.configure({ placeholder: placeholder ?? "" }),
     ],
     content: value,

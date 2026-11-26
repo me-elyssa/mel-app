@@ -119,6 +119,70 @@
   list-style: decimal;
 }
 
+.rich-text-content ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.rich-text-content ul[data-type="taskList"] ul[data-type="taskList"] {
+  padding-left: 1.5rem;
+}
+
+.rich-text-content li[data-type="taskItem"] {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.rich-text-content li[data-type="taskItem"] > label {
+  flex: 0 0 auto;
+  margin-top: 0.3rem;
+  user-select: none;
+}
+
+.rich-text-content li[data-type="taskItem"] > label input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 1.5px solid #9aa0a6;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  margin: 0;
+}
+
+.rich-text-content li[data-type="taskItem"] > label input[type="checkbox"]:checked {
+  background: #1e63ff;
+  border-color: #1e63ff;
+}
+
+.rich-text-content li[data-type="taskItem"] > label input[type="checkbox"]:checked::after {
+  content: "";
+  width: 0.3rem;
+  height: 0.55rem;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+/* Na visualização (fora do editor) as caixas não são interativas */
+.rich-text-content:not(.ProseMirror) li[data-type="taskItem"] > label input[type="checkbox"] {
+  pointer-events: none;
+  cursor: default;
+}
+
+.rich-text-content li[data-type="taskItem"] > div {
+  flex: 1 1 auto;
+}
+
+.rich-text-content li[data-type="taskItem"][data-checked="true"] > div {
+  color: #9aa0a6;
+  text-decoration: line-through;
+}
+
 .rich-text-content img {
   max-width: 100%;
   border-radius: 8px;
